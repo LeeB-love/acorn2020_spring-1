@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="todo">
+
+	<insert id="insert" parameterType="todoDto">
+		insert into todo
+		(num, work, regdate)
+		values(todo_seq.nextval, #{work}, sysdate)
+	</insert>
+	
+	<update id="update" parameterType="todoDto">
+		update todo
+		set work=#{work}, regdate=sysdate
+		where num=#{num}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from todo
+		where num=#{num}
+	</delete>
+
+	<select id="getData" parameterType="int" resultType="todoDto">
+		select num, work, regdate
+		from todo
+		where num=#{num}
+	</select>
+	
+	<select id="getList" resultType="todoDto">
+		select num, work, regdate
+		from todo
+		order by num asc
+	</select>
+</mapper>
