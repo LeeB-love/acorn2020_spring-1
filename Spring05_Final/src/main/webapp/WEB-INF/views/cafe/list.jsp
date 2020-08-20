@@ -12,14 +12,14 @@
 <div class="container">
 	<a href="private/insertform.do">새글 작성</a>
 	<h1>글 목록 입니다.</h1>
-	<table>
+	<table class="table">
 		<thead>
 			<tr>
-				<th>글번호</th>
-				<th>작성자</th>
-				<th>제목</th>
-				<th>조회수</th>
-				<th>등록일</th>
+				<th scope="col">글번호</th>
+				<th scope="col">작성자</th>
+				<th scope="col">제목</th>
+				<th scope="col">조회수</th>
+				<th scope="col">등록일</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -27,14 +27,10 @@
 			<tr>
 				<td>${tmp.num }</td>
 				<td>${tmp.writer }</td>
-				<td><a href="detail.do?num=${tmp.num }">${tmp.title }</a></td>
+				<td><a href="detail.do?num=${tmp.num }&condition=${condition }&keyword=${encodedK }">${tmp.title }</a></td>
+				<!-- 디테일로 갈 때 검색 조건과 검색 키워드를 전달해줘야 결과에 맞는 이전글, 다음글을 셀렉할 수 있다. -->
 				<td>${tmp.viewCount }</td>
 				<td>${tmp.regdate }</td>
-				<td>
-					<c:if test="${tmp.writer eq id }">
-						<a href="private/delete.do?num=${tmp.num }">삭제</a>
-					</c:if>
-				</td>
 			</tr>
 		</c:forEach>		
 		</tbody>

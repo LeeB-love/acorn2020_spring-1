@@ -56,4 +56,11 @@ public class CafeDaoImpl implements CafeDao{
 		session.update("cafe.update", dto);
 	}
 	
+	//키워드가 들어있는 CafeDto를 전달받아서 글 정보를 리턴하는 메소드
+	@Override
+	public CafeDto getData(CafeDto dto) {
+		
+		return session.selectOne("cafe.getData2", dto);
+	}
+	
 }
