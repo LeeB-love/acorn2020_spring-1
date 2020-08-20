@@ -93,13 +93,19 @@
 </head>
 <body>
 <div class="container">
+
+	<!-- ============ 키워드 검색 알림창 ==============-->
+	
 	<c:if test="${not empty keyword }">
 		<p class="alert alert-info">
 			<strong>${keyword }</strong> 라는 키워드로 검색한 결과에 대한 
 			자세히 보기 입니다.
 		</p>
 	</c:if>
+	
+	<!-- ============ 키워드 검색 알림창 ==============-->
 
+	<!-- =================== 이전글 다음글  =====================-->
 	<c:if test="${dto.prevNum ne 0 }">
 		<a class="btn btn-outline-info btn-sm" href="detail.do?num=${dto.prevNum }&condition=${condition}&keyword=${encodedK}">
 			<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -116,6 +122,11 @@
 			다음글
 		</a>	
 	</c:if>
+	<!-- =================== 이전글 다음글  =====================-->
+	
+	
+	
+	<!-- =================== 상세페이지 본문  =====================-->
 	<h1>글 상세 페이지</h1>
 	<table>
 		<tr>
@@ -138,6 +149,7 @@
 	<div class="contents">${dto.content }</div>
 	<a href="list.do">목록 보기</a>
 	
+	<!-- 수정 삭제는 작성자만 가능 -->
 	<c:if test="${dto.writer eq id }">
 		<a class="btn btn-outline-warning btn-sm" href="private/updateform.do?num=${dto.num }">
 			<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -153,8 +165,12 @@
 			삭제
 		</a>			
 	</c:if>
+	<!-- =================== 상세페이지 본문  =====================-->
 	
-	<!-- 원글에 댓글을 작성하는 form -->
+	
+	
+	
+	<!-- =================== 원글에 댓글을 작성하는 form  =====================-->
 	<form class="comment-form insert-form" action="private/comment_insert.do" method="post">
 		<!-- 원글의 글번호가 ref_group 번호가 된다. -->
 		<input type="hidden" name="ref_group" value="${dto.num }"/>
@@ -163,8 +179,12 @@
 		<textarea name="content"><c:if test="${empty id }">로그인이 필요합니다</c:if></textarea>
 		<button type="submit">등록</button>
 	</form>
+	<!-- =================== 원글에 댓글을 작성하는 form  =====================-->
 	
-	<!-- 댓글 목록 -->
+	
+	
+	
+	<!-- ============================ 댓글 목록  =============================-->
 	<div class="comments">
 		<ul>
 			<c:forEach var="tmp" items="${commentList }">
@@ -232,14 +252,49 @@
 			</c:forEach>
 		</ul>
 	</div>
-</div>
+	<!-- ============================ 댓글 목록  =============================-->
+	
+	
+	<!-- 위에 float:left 에 영향을 받지 않게 하기 위해  -->
+	<div class="clearfix"></div>
+	
+	
+	<!-- ============== 페이징 넘버 start ================ -->
+	<div class="page-display">
+		<ul class="pagination pagination-sm">
+			<c:if test="${startPageNum ne 1 }">
+				<li class="page-item"><a class="page-link" href="detail.do?num=${dto.num }&pageNum=${startPageNum-1 }">Prev</a></li>
+			</c:if>
+			<c:forEach var="i" begin="${startPageNum }" end="${endPageNum }">
+				<c:choose>
+					<c:when test="${i eq pageNum }">
+						<li class="page-item active"><a class="page-link" href="detail.do?num=${dto.num }&pageNum=${i }">${i }</a></li>
+					</c:when>
+					<c:otherwise>
+						<li class="page-item"><a class="page-link" href="detail.do?num=${dto.num }&pageNum=${i }">${i }</a></li>
+					</c:otherwise>
+				</c:choose>
+			</c:forEach>
+			<c:if test="${endPageNum lt totalPageCount }">
+				<li class="page-item"><a class="page-link" href="detail.do?num=${dto.num }&pageNum=${endPageNum+1 }">Next</a></li>
+			</c:if>
+		</ul>	
+	</div>
+	<!-- ============== 페이징 넘버 end ================ -->
+	
+	
+	
+</div><!-- /.container -->
 <div class="loader">
 	<img src="${pageContext.request.contextPath }/resources/images/ajax-loader.gif"/>
 </div>
 <script src="${pageContext.request.contextPath }/resources/js/jquery-3.5.1.js"></script>
 <script src="${pageContext.request.contextPath }/resources/js/jquery.form.min.js"></script>
 <script>
-	//댓글 수정 링크를 눌렀을때 호출되는 함수 등록
+
+
+
+	//=========  댓글 수정 링크를 눌렀을때 호출되는 함수 등록  =============
 	$(document).on("click",".comment-update-link", function(){
 		/*
 			click 이벤트가 일어난 댓글 수정 링크에 저장된 data-num 속성의 값을 
@@ -252,6 +307,9 @@
 		.slideToggle();
 	});
 	
+	
+	
+	//================ 댓글 업데이트 합수 등록  =====================
 	$(document).on("submit", ".update-form", function(){
 		//이벤트가 일어난 폼을 ajax로 전송되도록 하고 
 		$(this).ajaxSubmit(function(data){
@@ -269,6 +327,8 @@
 	});
 	
 	
+	
+	//================ 댓글 업데이트 합수 등록  =====================
 	$(document).on("click",".comment-delete-link", function(){
 		//삭제할 글번호 
 		var num=$(this).attr("data-num");
@@ -278,7 +338,10 @@
 			"/cafe/private/comment_delete.do?num="+num+"&ref_group=${dto.num}";
 		}
 	});
-	//답글 달기 링크를 클릭했을때 실행할 함수 등록
+	
+	
+	
+	//================ 답글 달기 링크를 클릭했을때 실행할 함수 등록  =====================
 	$(document).on("click",".reply-link", function(){
 		//로그인 여부
 		var isLogin=${not empty id};
@@ -299,6 +362,10 @@
 			$(this).text("답글");//답들로 바꾼다.
 		}	
 	});
+	
+	
+	
+	//================ 답글은 로그인 한 사람만 등록할 수 있게 하는 함수  =====================
 	$(document).on("submit",".insert-form", function(){
 		//로그인 여부
 		var isLogin=${not empty id};
@@ -309,6 +376,10 @@
 			return false; //폼 전송 막기 		
 		}
 	});
+	
+	
+	
+	//================ 상세보기 페이지 삭제 확인 ======================
 	function deleteConfirm(){
 		var isDelete=confirm("이 글을 삭제 하시겠습니까?");
 		if(isDelete){
@@ -316,75 +387,7 @@
 		}
 	}
 	
-	//페이지가 처음 로딩될때 1page 를 보여준다고 가정
-	var currentPage=1;
-	//전체 페이지의 수를 javascript 변수에 담아준다.
-	var totalPageCount=${totalPageCount};
 	
-	/*
-		페이지 로딩 시점에 document의 높이가 window의 실제 높이보다 작고 전체 페이지의 갯수(totalPageCount)가
-		현재페이지(currentPage)보다 크면 추가로 댓글을 받아오는 ajax요청을 해야한다.
-		
-		ex) 만약 댓글 1페이지가 삭제된 댓글이 많아서 문서 길이가 window 높이보다  적으면 스크롤이 안떠서 2페이지가 있음에도
-		2페이지 로딩을 못함 그럴 경우를 대비해서 document 높이가 window 높이보다 적고, 다음 페이지가 있으면 자동으로 다음 페이지를
-		띄우는 메소드를 추가시켜야함.
-	*/
-	var dH = $(document).height(); //문서의 높이
-	var wH = window.screen.height; //window이 높이
-	if(dH < wH && totalPageCount > currentPage){
-		//로딩 이미지 띄우기
-		$(".loader").show();
-		
-		currentPage++; //페이지를 1 증가 시키고 
-		//해당 페이지의 내용을 ajax  요청을 해서 받아온다. 
-		$.ajax({
-			url:"ajax_comment_list.do",
-			method:"get",
-			data:{pageNum:currentPage, ref_group:${dto.num}},
-			success:function(data){
-				console.log(data);
-				//data 가 html 마크업 형태의 문자열 
-				$(".comments ul").append(data);
-				//로딩 이미지를 숨긴다. 
-				$(".loader").hide();
-			}
-		});
-	}
-	
-	//웹브라우저에 scoll 이벤트가 일어 났을때 실행할 함수 등록 
-	$(window).on("scroll", function(){
-		if(currentPage == totalPageCount){//만일 마지막 페이지 이면 
-			return; //함수를 여기서 종료한다. 
-		}
-		
-		//위쪽으로 스크롤된 길이 구하기
-		var scrollTop=$(window).scrollTop();
-		//window 의 높이
-		var windowHeight=$(window).height();
-		//document(문서)의 높이
-		var documentHeight=$(document).height();
-		//바닥까지 스크롤 되었는지 여부
-		var isBottom = scrollTop+windowHeight + 10 >= documentHeight;
-		if(isBottom){//만일 바닥까지 스크롤 했다면...
-			//로딩 이미지 띄우기
-			$(".loader").show();
-			
-			currentPage++; //페이지를 1 증가 시키고 
-			//해당 페이지의 내용을 ajax  요청을 해서 받아온다. 
-			$.ajax({
-				url:"ajax_comment_list.do",
-				method:"get",
-				data:{pageNum:currentPage, ref_group:${dto.num}},
-				success:function(data){
-					console.log(data);
-					//data 가 html 마크업 형태의 문자열 
-					$(".comments ul").append(data);
-					//로딩 이미지를 숨긴다. 
-					$(".loader").hide();
-				}
-			});
-		}
-	});		
 </script>
 </body>
 </html>

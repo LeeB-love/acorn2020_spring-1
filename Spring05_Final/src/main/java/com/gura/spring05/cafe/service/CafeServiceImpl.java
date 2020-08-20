@@ -103,9 +103,25 @@ public class CafeServiceImpl implements CafeService{
 	@Override
 	public void getDetail(HttpServletRequest request) {
 		
+		//파라미터로 전달되는 글번호 (댓글 입장에선 ref_group) 
 		int num = Integer.parseInt(request.getParameter("num"));
+		
+		/*
+		* ex) /cafe/detail.do?num=10&pageNum=3
+		* num 은 ref_group 번호
+		* pageNum 은 댓글 페이징의 페이지 번호 
+		* 즉, 10번 게시글의 댓글인데 3번째 장에 속해있음
+		* 
+		* << 페이징 처리에 필요한 변수들 >>
+		* commentList : 댓글 내역. 댓글 전체의 리스트
+		* startPageNum : 시작 페이지 번호 (만약 페이징 버튼을 5개로 선정한닥 ㅗ했을 때 1, 6, 11, 16... 이런 식으로 올라감)
+		* endPageNum : 페이지 번호 끝  (5, 10, 15, 20...)
+		* pageNum : 클라이언트에 의해 선택된 페이지 번호
+		* tatalPageCount : 페이지 개수
+		*/
 
-	     //검색 키워드에 관련된 처리 
+	     //============= 검색 키워드에 관련된 처리 =================
+		
 	     String keyword=request.getParameter("keyword"); //검색 키워드
 	     String condition=request.getParameter("condition"); //검색 조건
 	     if(keyword==null){//전달된 키워드가 없다면 
@@ -143,35 +159,55 @@ public class CafeServiceImpl implements CafeService{
 	     
 	//===========댓글 페이징 처리==================
 	     
-	   //한 페이지에 나타낼 row 의 갯수
-	 	final int PAGE_ROW_COUNT=10;
-	 	
-	 	//보여줄 페이지의 번호
-	 	int pageNum=1;
-	 	
-	 	//보여줄 페이지 데이터의 시작 ResultSet row 번호
-	 	int startRowNum=1+(pageNum-1)*PAGE_ROW_COUNT;
-	 	//보여줄 페이지 데이터의 끝 ResultSet row 번호
-	 	int endRowNum=pageNum*PAGE_ROW_COUNT;
-	 	
-	 	//전체 row 의 갯수를 읽어온다.
-	 	int totalRow = cafeCommentDao.getCount(num);
-	 	//전체 페이지의 갯수 구하기
-	 	int totalPageCount=
-	 	(int)Math.ceil(totalRow/(double)PAGE_ROW_COUNT);
-	 	
-	 	// CafeDto 객체에 위에서 계산된 startRowNum 과 endRowNum 을 담는다.
-	 	CafeCommentDto commentDto = new CafeCommentDto();
-	 	commentDto.setStartRowNum(startRowNum);
-	 	commentDto.setEndRowNum(endRowNum);
-	 	commentDto.setRef_group(num);
-	     
-		//원글의 글번호를 이용해서 댓글 목록을 얻어온다. 
-		List<CafeCommentDto> commentList=cafeCommentDao.getList(commentDto);
-		//request 에 담아준다.
-		request.setAttribute("commentList", commentList);
-		request.setAttribute("totalPageCount", totalPageCount);
-		
+	     /* 아래는 댓글 페이징 처리 관련 비즈니스 로직 입니다.*/
+			final int PAGE_ROW_COUNT=5;
+			final int PAGE_DISPLAY_COUNT=5;
+			
+			
+			//전체 row 의 갯수를 읽어온다. 자세히 보여줄 글의 번호가 ref_group  번호 이다.
+			int totalRow=cafeCommentDao.getCount(num);
+
+			//보여줄 페이지의 번호(만일 pageNum 이 넘어오지 않으면 가장 마지막 페이지)
+			String strPageNum=request.getParameter("pageNum");
+			//전체 페이지의 갯수 구하기
+			int totalPageCount= (int)Math.ceil(totalRow/(double)PAGE_ROW_COUNT);
+			//일단 마지막 페이지의 댓글에 목록을 보여주기로 하고
+			int pageNum=totalPageCount;
+			//만일 페이지 번호가 넘어온다면 (클라이언트가 페이징 넘버 버튼을 눌러야만 페이지 번호가 넘어옴 안누르면 null)
+			if(strPageNum!=null) {
+				pageNum=Integer.parseInt(strPageNum);
+			}
+			//보여줄 페이지 데이터의 시작 ResultSet row 번호
+			int startRowNum=1+(pageNum-1)*PAGE_ROW_COUNT;
+			//보여줄 페이지 데이터의 끝 ResultSet row 번호
+			int endRowNum=pageNum*PAGE_ROW_COUNT;
+			
+			
+			//시작 페이지 번호
+			int startPageNum=
+				1+((pageNum-1)/PAGE_DISPLAY_COUNT)*PAGE_DISPLAY_COUNT;
+			//끝 페이지 번호
+			int endPageNum=startPageNum+PAGE_DISPLAY_COUNT-1;
+			//끝 페이지 번호가 잘못된 값이라면 
+			if(totalPageCount < endPageNum){
+				endPageNum=totalPageCount; //보정해준다. 
+			}
+			
+			// CafeCommentDto 객체에 위에서 계산된 startRowNum 과 endRowNum 을 담는다.
+			CafeCommentDto commentDto=new CafeCommentDto();
+			commentDto.setStartRowNum(startRowNum);
+			commentDto.setEndRowNum(endRowNum);
+			//ref_group 번호도 담는다.
+			commentDto.setRef_group(num);
+			
+			//DB 에서 댓글 목록을 얻어온다.
+			List<CafeCommentDto> commentList=cafeCommentDao.getList(commentDto);
+			//request 에 담아준다.
+			request.setAttribute("commentList", commentList);
+			request.setAttribute("totalPageCount", totalPageCount);
+			request.setAttribute("startPageNum", startPageNum);
+			request.setAttribute("endPageNum", endPageNum);
+			request.setAttribute("pageNum", pageNum);
 	}
 
 	@Override
