@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>/angular/test12.html</title>
+<link rel="stylesheet" href="../resources/css/bootstrap.css" />
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+<script src="../resources/js/angular.min.js"></script>
+<script>
+	var cafeApp = angular.module("cafeApp",[]);
+	cafeApp.controller("cafeCtrl", function($scope, $http){
+		//페이지 로딩되는 시점에 실행되는 영역
+		$scope.pageNum=1;
+		$scope.list
+		//ajax로 카페글 목록을 요청
+		$http({
+			url : "/spring05/cafe/ajax_list.do",
+			method : "get",
+			param : {pageNum:$scope.pageNum},
+		}).success(function(data){
+			$scope.list = data;
+		});
+		
+		//다음 페이지 버튼을 눌렀을 때 호출되는 함수
+		$scope.next=function(){
+			$scope.pageNum++
+			
+			$http({
+				url : "/spring05/cafe/ajax_list.do",
+				method : "get",
+				param : {pageNum:$scope.pageNum},
+			}).success(function(data){
+				$scope.list = data;
+			});
+		}
+		
+		
+		
+		
+	});
+</script>
+</head>
+<body ng-app="cafeApp">
+	<div class="container" ng-controller="cafeCtrl">
+		<h1>카페 글 목록입니다.</h1>
+		<table class="table table-striped">
+			<thead class="thead-dark">
+				<tr>
+					<th>번호</th>
+					<th>작성자</th>
+					<th>제목</th>
+					<th>조회수</th>
+					<th>작성일</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="tmp in list">
+					<td>{{tmp.num}}</td>
+					<td>{{tmp.writer}}</td>
+					<td>{{tmp.title}}</td>
+					<td>{{tmp.viewCount}}</td>
+					<td>{{tmp.regdate}}</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<div class="page-display">
+			<ul class="pagination pagination-sm">
+			<c:if test="${startPageNum ne 1 }">
+				<li class="page-item"><a class="page-link" ng-click="">Prev</a></li>
+			</c:if>
+			<c:forEach var="i" begin="${startPageNum }" end="${endPageNum }">
+			<c:choose>
+					<c:when test="${i eq pageNum }">
+						<li class="page-item active"><a class="page-link" href="list.do?pageNum=${i }">${i }</a></li>
+					</c:when>
+					<c:otherwise>
+						<li class="page-item"><a class="page-link" href="list.do?pageNum=${i }">${i }</a></li>
+					</c:otherwise>
+				</c:choose>
+			</c:forEach>
+			<c:if test="${endPageNum lt totalPageCount }">
+				<li class="page-item"><a class="page-link" href="list.do?pageNum=${endPageNum+1 }">Next</a></li>
+			</c:if>
+			</ul>	
+		</div>
+		
+		<button ng-click="next()" class="btn btn-outline-primary">다음페이지</button>
+	</div>
+</body>
+</html>

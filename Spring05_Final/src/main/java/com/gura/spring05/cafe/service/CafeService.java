@@ -1,5 +1,7 @@
 package com.gura.spring05.cafe.service;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.gura.spring05.cafe.dto.CafeCommentDto;
@@ -24,5 +26,7 @@ public interface CafeService {
 	public void updateComment(CafeCommentDto dto); //댓글 수정
 	
 	public void moreCommentList(HttpServletRequest request);//댓글 추가 응답
+	
+	public List<CafeDto> getList2(HttpServletRequest request);
 
 }

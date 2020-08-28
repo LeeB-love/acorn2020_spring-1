@@ -6,6 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import com.gura.spring05.users.dto.UsersDto;
 
+/*
+* DAO에 붙인 @Repository라는 어노테이션은 DB과련 작업을 하다가 SQL Exception 이 발생하는 경우 해당 Exception 대신에 
+* DataAccessException을 발생시킨다.
+* 따라서 DB 관련  작업을 하다가 발생하는 예외는 예외 컨트롤러에서 처리를 하면된다.
+*/
+
 @Repository
 public class UsersDaoImpl implements UsersDao{
 	@Autowired

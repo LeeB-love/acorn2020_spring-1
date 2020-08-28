@@ -126,7 +126,11 @@ public class CafeController {
 		return mView;
 	}
 	
-
+	@RequestMapping("/cafe/ajax_list")
+	@ResponseBody
+	public List<CafeDto> ajaxList(HttpServletRequest request){
+		return service.getList2(request);
+	}
 	
 }
 

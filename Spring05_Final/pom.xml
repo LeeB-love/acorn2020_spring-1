@@ -169,13 +169,32 @@
           <artifactId>spring-security-web</artifactId>
           <version>4.0.0.RELEASE</version>
       </dependency>
-      <!-- 트렌젝션 처리를 위한 라이브러리 -->
+      
+     	<!-- Aop 용 라이브러리 -->
+	   	<dependency>
+	   		<groupId>org.springframework</groupId>
+	   		<artifactId>spring-aop</artifactId>
+	   		<version>4.0.0.RELEASE</version>
+	  	</dependency>
+	    <dependency>
+	   		<groupId>org.aspectj</groupId>
+	   		<artifactId>aspectjweaver</artifactId>
+	   		<version>1.8.0</version>
+	     </dependency>
+	    <dependency>
+	   		<groupId>cglib</groupId>
+	   		<artifactId>cglib</artifactId>
+	   		<version>3.2.0</version>
+	  	</dependency> 
+      
+      <!-- 트랜잭션 처리를 위한 라이브러리 -->
       <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-tx</artifactId>
           <version>4.0.0.RELEASE</version>
       </dependency>
    </dependencies>
+   
     <build>
         <plugins>
             <plugin>

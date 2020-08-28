@@ -1,6 +1,7 @@
 package com.gura.spring05.exception;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 */
 @ControllerAdvice
 public class ExceptionController {
+	
 	//spring framework가 동작하는 중에 NotDeleteException type의 예외가 발생하면 호출되는 메소드
 	@ExceptionHandler(NotDeleteExeption.class)
 	public ModelAndView notDelete(NotDeleteExeption nde) {
@@ -21,4 +23,28 @@ public class ExceptionController {
 		mView.setViewName("error/info");
 		return mView;
 	}
+	
+	@ExceptionHandler(NoDeliveryException.class)
+	public ModelAndView noDelivery(NoDeliveryException nde) {
+		ModelAndView mView = new ModelAndView();
+		mView.addObject("exception", nde);
+		mView.setViewName("error/no_delivery");
+		return mView;
+	}
+
+	/*
+	* Dao에서 DB 관련 작업을 하다가 예외가 발생하면 실행순서가 여기로 들어온다.
+	*/
+	@ExceptionHandler(DataAccessException.class)
+	public ModelAndView dataAccess(DataAccessException dae) {
+		
+		ModelAndView mView = new ModelAndView();
+		
+		mView.addObject("exception", dae);
+		mView.setViewName("error/data_access");
+		
+		return mView;
+	}
 }
+
+

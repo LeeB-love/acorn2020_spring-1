@@ -3,9 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
 	   <!-- 
      	 JNDI(디렉토리 서비스에서 제공하는 데이터 및 객체를 발견하고 참고 하기 위한 자바 API) 
@@ -35,6 +39,8 @@
    -->
 	
 	
+	<!-- ============== SplSessionFactory 설정 ================= -->
+	
 	 <!-- SqlSessionFactory 객체 -->
 	<beans:bean id="sessionFactory" 
 		class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -43,24 +49,42 @@
 	value="classpath:com/gura/spring05/mybatis/Configuration.xml"/>
 	 <!-- 위의 문장으로 Mapper 사용할 준비하기 -->
 	</beans:bean>
-	   <!-- 
+	  <!-- 
       sessionFactory=new SqlSessionFactoryBean();
       sessionFactory.setDataSource(dataSource);
       sessionFactory.setConfigLocation("classpath:com/gura/xxx");
-    -->
-	
-	  <!-- 
-      SqlSession 인터페이스를 구현한 
-      SqlSessionTemplate(SqlSession) 객체 
-      Dao 가 의존하는 객체 
-   -->
+      -->
 	
 	<beans:bean class="org.mybatis.spring.SqlSessionTemplate">
 		<beans:constructor-arg name="sqlSessionFactory" 
 			ref="sessionFactory"/>
 	</beans:bean>
 	
-
+	<!-- ============== SplSessionFactory 설정 ================= -->
+	
+	
+	
+	
+	<!-- ============== 트랜잭션 설정 ================= -->
+	
+	<!-- Spring Transaction Manager 설정. (class에 datasourceTransaction manager이 등록되어있어야함)-->
+	<!-- SqlSession 인터페이스를 구현한 SqlSessionTemplate(SqlSession) 객체 Dao 가 의존하는 객체 
+		txManger=new DataSourceTransactionManager();
+		txManager.setDataSource(dataSource);를 대신하는 코드이다.-->
+	<beans:bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<beans:property name="dataSource" ref="dataSource"/>
+	</beans:bean>
+	
+	<!-- @Transactional 어노테이션으로 트랜잭션을 관리할 수 있도록 설정 -->
+	<tx:annotation-driven transaction-manager="txManager"/>
+	
+	<!-- ============== 트랜잭션 설정 ================= -->
+	
+	
+	
+	
+	
+	
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
 	<!-- Enables the Spring MVC @Controller programming model -->
@@ -76,6 +100,7 @@
 		<beans:property name="order" value="1"/>
 	</beans:bean>
 	
+	<!-- spring05의 모든 객체를 component-scan 하여 빈으로 관리할 것들을 스프링 컨테이너에 생성 -->
 	<context:component-scan base-package="com.gura.spring05" />
 	
 	
@@ -93,5 +118,8 @@
 	-->
 	<beans:bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
 		<beans:property name="order" value="0"/>
-	</beans:bean>		
+	</beans:bean>
+	
+	<!-- 어노테이션 기반으로 aop 적용 가능하게 하기 (활성화하려면 Namespaces 에서 문서 형식 aop 추가해야함)-->
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
 </beans:beans>
