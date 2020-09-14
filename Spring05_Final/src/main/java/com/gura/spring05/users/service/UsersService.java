@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.gura.spring05.users.dto.UsersDto;
 
 public interface UsersService {
@@ -30,4 +31,9 @@ public interface UsersService {
 	public void updateUser(HttpSession session, UsersDto dto);
 	
 	public void updateUserPwd(HttpSession session, UsersDto dto, ModelAndView mView);
+	
+	public Map<String, Object> ajaxLoginProcess(UsersDto dto, HttpSession session);
+	
+	public boolean jsonpLogin(UsersDto dto);
+	
 }

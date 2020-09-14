@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html data-ng-app="myApp">
+<head>
+<meta charset="UTF-8">
+<title>/angularjs/jsonp03.html</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.32/angular.min.js"></script>
+<script>
+	var myApp=anguler.module("myApp",[]);
+	myApp.controller("one", function($scope, $http){
+		$scope.getInfo=function(){
+			var url="http://localhost:8888/spring05/angularjs/jsonp01.jsp?callback=JSON_CALLBACK";
+			$http
+			.jsonp(url)
+			.success(function(data){
+				console.log(data);
+			})
+			.error(function(data){
+				console.log(data);
+			});
+		}
+	});
+</script>
+</head>
+<body data-ng-controller="one">
+	<h1>jQuery를 활용한 jsonp 예제</h1>
+	<button data-ng-click="getInfo()">회원정보 얻어오기</button>
+	<p></p>
+<script>
+</script>
+</body>
+</html>

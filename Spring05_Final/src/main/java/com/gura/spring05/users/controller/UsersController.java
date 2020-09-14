@@ -1,6 +1,7 @@
 package com.gura.spring05.users.controller;
 
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,11 +12,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.gura.spring05.users.dto.UsersDto;
 import com.gura.spring05.users.service.UsersService;
 
@@ -152,7 +155,35 @@ public class UsersController {
 		   mView.setViewName("users/private/pwd_update");
 		   return mView;
 	   }
-		
+	   
+	   @RequestMapping("/users/ajax_login_check")
+	   @ResponseBody
+	   public Map<String, Object> ajaxLoginCheck(HttpSession session){
+		   //세션에서 id라는 키값으로 저장된 문자열을 읽어온다. 없으면 null
+		   String id = (String)session.getAttribute("id");
+		   //결과를 Map에 담고
+		   Map<String, Object> map = new HashMap<>();
+		   map.put("id", id);
+		   return map;
+	   }
+	
+	   @RequestMapping(value="/users/ajax_login", method=RequestMethod.POST)
+	   @ResponseBody
+	   public Map<String, Object> ajaxLogin(UsersDto dto, HttpSession session){
+		   //서비스가 리턴해주는 Map 객체를 리턴하면 json 문자열이 응답된다.
+		   //로그인 성공인 경우 {"isSuccess":true, "id":"gura1"}
+		   //로그인 실패인 경우{"isSuccess":false}
+		   return service.ajaxLoginProcess(dto, session);
+	   }
+	   
+	   
+	   @RequestMapping(value="/users/jsonp_login", method=RequestMethod.GET)
+	   @ResponseBody
+	   public JSONPObject jsonpLogin(@RequestParam(defaultValue = "callback") String callback, UsersDto dto, HttpSession session) {
+		   Map<String, Object> map = service.ajaxLoginProcess(dto, session);
+		   JSONPObject jp = new JSONPObject(callback, map);
+		   return jp;
+	   }
 }
 
 

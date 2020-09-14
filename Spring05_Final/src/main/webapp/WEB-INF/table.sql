@@ -1,5 +1,5 @@
 create table board_cafe(
-	num number primary key
+	num number primary key,
 	writer varchar2(200) not null,
 	title varchar2(100) not null,
 	content clob,
